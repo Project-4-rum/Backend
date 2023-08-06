@@ -1,0 +1,33 @@
+GET http://localhost:3000/users/
+
+###
+GET http://localhost:3000/users/64ce3e4d0ab8ba874611be23
+
+###
+DELETE http://localhost:3000/users/
+
+###
+PATCH http://localhost:3000/users/64ce3e4d0ab8ba874611be23
+Content-Type: application/json
+
+{
+    "data" : {
+        "username" : "NotTheRealJeff"
+    }
+}
+
+
+###
+POST http://localhost:3000/users/
+Content-Type: application/json
+
+{
+    "credentials" : {
+        "userID" : "jeff@111",
+        "password" : "mynameisjeff69"
+    },
+    "data" : {
+        "username" : "Jeff",
+        "mail" : "jeffthagod@gmail.com"
+    }
+}
