@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const User = require("../models/users")
+const emailValidator = require('deep-email-validator')
 
-// TODO :  Get all users
+// Get all users
 router.get('/', async (req, res)=>{
     try {
         const users = await User.find()
@@ -13,63 +14,76 @@ router.get('/', async (req, res)=>{
 
 })
 
-// TODO : get one user
+// get one user
 router.get('/:id', getUser, (req, res)=>{
     res.json(res.user)
 })
 
 
-// TODO : create a user
-router.post('/', async (req, res)=>{
-    const user = new User({
-        credentials : {
-            userID : req.body.credentials.userID,
-            password : req.body.credentials.password
-        },
-        data : {
-            username : req.body.data.username,
-            mail : req.body.data.mail
-        }
-    })
+// TODO  : verify the email in create and update routes
 
+// create a user
+router.post('/register', async (req, res)=>{
+
+    // return the userdata after validation
     try {
+        const validation = await emailValidator.validate(req.body.credentials.email);
+
+        if (!validation.valid)
+            return res.status(403).json({ message: "Email validation failed", validationData: validation})
+
+        const user = new User({
+            credentials: {
+                userID: req.body.credentials.userID,
+                email: req.body.credentials.email,
+                password: req.body.credentials.password
+            },
+            data: {
+                username: req.body.data.username
+            }
+        })
+
         const newuser = await user.save()
         res.status(201).json(newuser);
-    }catch(error){
-        res.status(400).json({message : error.message})
+    } catch (error) {
+        res.status(400).json({ message: error.message })
     }
 })
 
 
-// TODO : update a user
+// update a user
 router.patch('/:id', getUser, async (req, res)=>{
 
-    if (req.body.credentials != null) {
-        if (req.body.credentials.userID != null) {
-            res.user.credentials.userID = req.body.credentials.userID
-        }
-        if (req.body.credentials.password != null) {
-            res.user.credentials.password = req.body.credentials.password
-        }
-    }
-    if (req.body.data != null) {
-        if (req.body.data.username != null) {
-            res.user.data.username = req.body.data.username
-        }
-        if (req.body.data.mail != null) {
-            res.user.data.mail = req.body.data.mail
-        }
-    }
     try{
+        const validation = await emailValidator.validate(req.body.credentials.email);
+
+        if (!validation.valid)
+            return res.status(403).json({ message: "Email validation failed", validationData: validation })
+        if (req.body.credentials != null) {
+            if (req.body.credentials.userID != null) {
+                res.user.credentials.userID = req.body.credentials.userID
+            }
+            if (req.body.credentials.email != null) {
+                res.user.credentials.email = req.body.credentials.email
+            }
+            if (req.body.credentials.password != null) {
+                res.user.credentials.password = req.body.credentials.password
+            }
+        }
+        if (req.body.data != null) {
+            if (req.body.data.username != null) {
+                res.user.data.username = req.body.data.username
+            }
+        }
         const updatedUser = await res.user.save()
         res.json(updatedUser)
-    }catch(error){
-        res.status(400).json({message : error.message})
+    } catch (error) {
+        res.status(400).json({ message: error.message })
     }
 })
 
 
-// TODO : delete user
+// delete user
 router.delete('/:id', getUser, async (req, res)=>{
     try{
         await res.user.deleteOne()
@@ -93,6 +107,5 @@ async function getUser(req, res, next){
     res.user = user
     next()
 }
-
 
 module.exports = router

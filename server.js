@@ -1,11 +1,11 @@
-require('dotenv').config();
+DATABASE_URL = 'mongodb://127.0.0.1:27018'
 
 const express = require('express');
 const app = express();
 app.use(express.json());
 
 const mongoose = require('mongoose');
-mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser : true});
+mongoose.connect(DATABASE_URL, {useNewUrlParser : true});
 const db = mongoose.connection;
 
 db.on('error', (error)=> console.error(error));

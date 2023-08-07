@@ -1,10 +1,10 @@
 GET http://localhost:3000/users/
 
 ###
-GET http://localhost:3000/users/64ce3e4d0ab8ba874611be23
+GET http://localhost:3000/users/64ce3e830ab8ba874611be25
 
 ###
-DELETE http://localhost:3000/users/
+DELETE http://localhost:3000/users/64ce3e830ab8ba874611be25
 
 ###
 PATCH http://localhost:3000/users/64ce3e4d0ab8ba874611be23
@@ -18,16 +18,16 @@ Content-Type: application/json
 
 
 ###
-POST http://localhost:3000/users/
+POST http://localhost:3000/users/register
 Content-Type: application/json
 
 {
     "credentials" : {
         "userID" : "jeff@111",
+        "email" : "sunx.sapk@gmail.com",
         "password" : "mynameisjeff69"
     },
     "data" : {
-        "username" : "Jeff",
-        "mail" : "jeffthagod@gmail.com"
+        "username" : "Jeff"
     }
 }
