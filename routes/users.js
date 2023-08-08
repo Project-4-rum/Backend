@@ -9,30 +9,26 @@ const router = express.Router()
 const User = require("../models/users")
 const emailValidator = require('deep-email-validator')
 
-// Get all users
-router.get('/', async (req, res)=>{
-    try {
-        const users = await User.find()
-        res.json(users)
-    }catch (error){
-        res.status(500).json({message : error.message})
-    }
-
-})
-
 // get one user
-router.get('/:id', getUser, async(req, res)=>{
-    res.json(res.user)
-})
-
-router.get('/:userID', async (req, res) =>{
-
+router.get('/', async (req, res) => {
     try {
-        let result = await userbyID(req.params.userID)
-        if(!result.user)
-            return res.status(404).json({message : result.message})
-        res.json(user)
+        const id = req.query.id;
+        const userID = req.query.userID;
 
+        if (id) {
+            let user = await User.findById(id)
+            if (!user) 
+                return res.status(404).json({ message: "Cannot find a user by given id" })
+            res.json(user)
+        } else if (userID) {
+            let result = await userbyID(userID)
+            if (!result.user)
+                return res.status(404).json({ message: result.message })
+            res.json(result.user)
+        } else {
+            const users = await User.find()
+            res.json(users)
+        }
     }catch(error){
         res.status(400).json({message : error.message})
     }
@@ -41,11 +37,10 @@ router.get('/:userID', async (req, res) =>{
 // create a user
 router.post('/', async (req, res)=>{
 
-    // return the userdata after validation
     try {
-        //const validation = await emailValidator.validate(req.body.credentials.email);
-        //if (!validation.valid)
-        //    return res.status(403).json({ message: "Email validation failed", validators: validation.validators, reason : validation.reason})
+        const validation = await emailValidator.validate(req.body.credentials.email);
+        if (!validation.valid)
+            return res.status(403).json({ message: "Email validation failed", validators: validation.validators, reason : validation.reason})
         
         const result = await userbyID(req.body.credentials.userID);
         if(result.user)
@@ -121,6 +116,7 @@ router.delete('/', async (req, res)=>{
     }
 })
 
+// helper functions
 async function getUser(req, res, next){
     try {
         let user = await User.findById(req.params.id)

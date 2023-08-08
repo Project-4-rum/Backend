@@ -1,11 +1,11 @@
-GET http://localhost:3000/users/
+GET http://localhost:3000/users
 
 ###
-GET http://localhost:3000/users?id=64d230ac9c3865e2208bb733
+GET http://localhost:3000/users/?id=64d230ac9c3865e2208bb733
 
 
 ###
-GET http://localhost:3000/users/?userID=jeff@123
+GET http://localhost:3000/users/?userID=yomama@111
 
 
 ###
@@ -33,8 +33,8 @@ Content-Type: application/json
 
 {
     "credentials" : {
-        "userID" : "jeff@111",
-        "email" : "sunx.sapk@gmail.com",
+        "userID" : "yomama@111",
+        "email" : "yomama@gmail.com",
         "password" : "mynameisjeff69"
     },
     "data" : {
