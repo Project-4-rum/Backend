@@ -1,3 +1,9 @@
+// definitions
+const __SERVER_ERR = "Server Error while searching for user"
+const __USER_NOT_FOUND = "User not found"
+const __USER_FOUND = "User successfully found"
+
+//requirements
 const express = require('express')
 const router = express.Router()
 const User = require("../models/users")
@@ -15,23 +21,36 @@ router.get('/', async (req, res)=>{
 })
 
 // get one user
-router.get('/:id', getUser, (req, res)=>{
+router.get('/:id', getUser, async(req, res)=>{
     res.json(res.user)
 })
 
+router.get('/:userID', async (req, res) =>{
 
-// TODO  : verify the email in create and update routes
+    try {
+        let result = await userbyID(req.params.userID)
+        if(!result.user)
+            return res.status(404).json({message : result.message})
+        res.json(user)
+
+    }catch(error){
+        res.status(400).json({message : error.message})
+    }
+})
 
 // create a user
-router.post('/register', async (req, res)=>{
+router.post('/', async (req, res)=>{
 
     // return the userdata after validation
     try {
-        const validation = await emailValidator.validate(req.body.credentials.email);
-
-        if (!validation.valid)
-            return res.status(403).json({ message: "Email validation failed", validationData: validation})
-
+        //const validation = await emailValidator.validate(req.body.credentials.email);
+        //if (!validation.valid)
+        //    return res.status(403).json({ message: "Email validation failed", validators: validation.validators, reason : validation.reason})
+        
+        const result = await userbyID(req.body.credentials.userID);
+        if(result.user)
+            return res.status(403).json({message : "UserID already exists"})
+        
         const user = new User({
             credentials: {
                 userID: req.body.credentials.userID,
@@ -55,15 +74,14 @@ router.post('/register', async (req, res)=>{
 router.patch('/:id', getUser, async (req, res)=>{
 
     try{
-        const validation = await emailValidator.validate(req.body.credentials.email);
-
-        if (!validation.valid)
-            return res.status(403).json({ message: "Email validation failed", validationData: validation })
         if (req.body.credentials != null) {
             if (req.body.credentials.userID != null) {
                 res.user.credentials.userID = req.body.credentials.userID
             }
             if (req.body.credentials.email != null) {
+                const validation = await emailValidator.validate(req.body.credentials.email);
+                if (!validation.valid)
+                    return res.status(403).json({ message: "Email validation failed", validationData: validation })
                 res.user.credentials.email = req.body.credentials.email
             }
             if (req.body.credentials.password != null) {
@@ -93,19 +111,36 @@ router.delete('/:id', getUser, async (req, res)=>{
     }
 })
 
+//delete all users
+router.delete('/', async (req, res)=>{
+    try{
+        const result = await User.deleteMany({});
+        res.json({ message: `${result.deletedCount} users deleted successfully` });
+    }catch(error){
+        res.status(500).json({message : error.message})
+    }
+})
+
 async function getUser(req, res, next){
-    let user
     try {
-        user = await User.findById(req.params.id)
+        let user = await User.findById(req.params.id)
         if(!user){
             return res.status(404).json({message : "Cannot find a user by given id"})
         }
-
+        res.user = user
     }catch(error){
         return res.status(400).json({message : error.message})
     }
-    res.user = user
     next()
+}
+
+async function userbyID(userID){
+    try{
+        let user = await User.findOne({"credentials.userID" : userID});
+        return {message : !user?__USER_NOT_FOUND:__USER_FOUND, user : user};
+    }catch(error){
+        return {message : __SERVER_ERR, user : {}}
+    }
 }
 
 module.exports = router

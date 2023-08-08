@@ -1,13 +1,23 @@
 GET http://localhost:3000/users/
 
 ###
-GET http://localhost:3000/users/64ce3e830ab8ba874611be25
+GET http://localhost:3000/users?id=64d230ac9c3865e2208bb733
+
 
 ###
-DELETE http://localhost:3000/users/64ce3e830ab8ba874611be25
+GET http://localhost:3000/users/?userID=jeff@123
+
 
 ###
-PATCH http://localhost:3000/users/64ce3e4d0ab8ba874611be23
+DELETE http://localhost:3000/users/64d22cc29c3865e2208bb721
+
+
+###
+DELETE http://localhost:3000/users/
+
+
+###
+PATCH http://localhost:3000/users/id:64ce3e4d0ab8ba874611be23
 Content-Type: application/json
 
 {
@@ -18,7 +28,7 @@ Content-Type: application/json
 
 
 ###
-POST http://localhost:3000/users/register
+POST http://localhost:3000/users/
 Content-Type: application/json
 
 {
