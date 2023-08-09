@@ -1,4 +1,4 @@
-const { File } = require("../models/files.model");
+const { File, getFilesByTag } = require("../models/files.model");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -37,6 +37,19 @@ const fileController = {
   },
   searchFilesByTag: (req, res) => {
     //
+    const { tags } = req.query;
+    if (!tags) {
+      return res.status(400).json({ error: "Tags parameter is required" });
+    }
+
+    const tagsArray = tags.split(",").map((tags) => tags.trim());
+    getFilesByTag(tagsArray, (files) => {
+      if (files) {
+        res.status(200).json(files);
+      } else {
+        res.status(500).json({ error: "Error retrieving Files Data" });
+      }
+    });
   },
   downloadFile: (req, res) => {
     //

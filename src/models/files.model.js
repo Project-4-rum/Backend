@@ -2,6 +2,8 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const fs = require("fs");
 
+const dbFilePath = path.join(__dirname, "../storage/DB/fileDB.json");
+
 class File {
   constructor(filename, size, tags = []) {
     this.id = uuidv4();
@@ -22,7 +24,6 @@ class File {
     };
 
     const jsonString = JSON.stringify(fileData, null, 2);
-    const dbFilePath = path.join(__dirname, "../storage/DB/fileDB.json");
 
     console.log(dbFilePath);
 
@@ -49,7 +50,7 @@ class File {
 }
 
 function getFilesByTag(tags, callback) {
-  fs.readFile("../storage/DB/fileDB.json", "utf-8", (err, data) => {
+  fs.readFile(dbFilePath, "utf-8", (err, data) => {
     if (err) {
       console.log({ error: `Error reading: ${err}` });
       console.error("ERROR", err);
@@ -65,10 +66,5 @@ function getFilesByTag(tags, callback) {
     }
   });
 }
-
-// const COA = new File("SA sir", 26, ["COA", "mam"]);
-// getFilesByTag(["COA"], (result) => {
-//   console.log(result);
-// });
 
 module.exports = { File, getFilesByTag };
