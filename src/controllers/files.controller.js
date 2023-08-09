@@ -25,9 +25,9 @@ const fileController = {
       }
       // console
 
-      const newFile = new File(req.file.filename, req.file.size, ["COA", "SE"]);
-      // newFile.file = req.file;
-      // console.log(req);
+      const { filename, tags } = req.body;
+      const tagsArray = tags.split(",").map((tag) => tag.trim());
+      const newFile = new File(filename, req.file.size, tagsArray);
 
       res.status(201).json({ message: "File Uploaded Successfully" });
     });

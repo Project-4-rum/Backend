@@ -32,10 +32,10 @@ class File {
         filesArray = JSON.parse(data);
       }
       filesArray.push(fileData);
-      console.log(fileData);
+      // console.log(fileData);
 
       const jsonString = JSON.stringify(filesArray, null, 2);
-      console.log(`JSON __________________${jsonString}`);
+      // console.log(`JSON __________________${jsonString}`);
 
       fs.writeFile(dbFilePath, jsonString + "\n", "utf-8", (err) => {
         if (err) {
