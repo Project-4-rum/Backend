@@ -19,8 +19,12 @@ const userSchema = new mongoose.Schema({
         username : {
             type : String,
             required : true,
-            default : '4rumUser69' 
-        }
+            default : 'Noob4rumUser' 
+        },
+        postIDs : [{
+            type : String,
+            required : false
+        }]
     }
 })
 

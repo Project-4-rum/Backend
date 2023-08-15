@@ -17,12 +17,15 @@ DELETE http://localhost:3000/users/
 
 
 ###
-PATCH http://localhost:3000/users/id:64ce3e4d0ab8ba874611be23
+PATCH http://localhost:3000/users/64d2306a9c3865e2208bb72f
 Content-Type: application/json
 
 {
+    "credentials" :{
+        "email" : "supdude@gmail.com"
+    },
     "data" : {
-        "username" : "NotTheRealJeff"
+        "username" : "I_am_the_danger_Skyler"
     }
 }
 
@@ -34,7 +37,7 @@ Content-Type: application/json
 {
     "credentials" : {
         "userID" : "yomama@111",
-        "email" : "yomama@gmail.com",
+        "email" : "sunilsapkota1224@gmail.com",
         "password" : "mynameisjeff69"
     },
     "data" : {

@@ -2,6 +2,8 @@
 const __SERVER_ERR = "Server Error while searching for user"
 const __USER_NOT_FOUND = "User not found"
 const __USER_FOUND = "User successfully found"
+const __VALID_EMAIL = "Email verification succeeded"
+const __INVALID_EMAIL = "Email verification failed"
 
 //requirements
 const express = require('express')
@@ -18,7 +20,7 @@ router.get('/', async (req, res) => {
         if (id) {
             let user = await User.findById(id)
             if (!user) 
-                return res.status(404).json({ message: "Cannot find a user by given id" })
+                return res.status(404).json({ message: __USER_NOT_FOUND})
             res.json(user)
         } else if (userID) {
             let result = await userbyID(userID)
@@ -37,11 +39,11 @@ router.get('/', async (req, res) => {
 // create a user
 router.post('/', async (req, res)=>{
 
-    try {
-        const validation = await emailValidator.validate(req.body.credentials.email);
-        if (!validation.valid)
-            return res.status(403).json({ message: "Email validation failed", validators: validation.validators, reason : validation.reason})
-        
+    try { 
+        const validation = await checkEmailExistence(req.body.credentials.email);
+        if(!validation.verified)
+            return res.status(403).json(validation.message);
+
         const result = await userbyID(req.body.credentials.userID);
         if(result.user)
             return res.status(403).json({message : "UserID already exists"})
@@ -53,7 +55,8 @@ router.post('/', async (req, res)=>{
                 password: req.body.credentials.password
             },
             data: {
-                username: req.body.data.username
+                username: req.body.data.username,
+                postIDs : []
             }
         })
 
@@ -69,25 +72,12 @@ router.post('/', async (req, res)=>{
 router.patch('/:id', getUser, async (req, res)=>{
 
     try{
-        if (req.body.credentials != null) {
-            if (req.body.credentials.userID != null) {
-                res.user.credentials.userID = req.body.credentials.userID
-            }
-            if (req.body.credentials.email != null) {
-                const validation = await emailValidator.validate(req.body.credentials.email);
-                if (!validation.valid)
-                    return res.status(403).json({ message: "Email validation failed", validationData: validation })
-                res.user.credentials.email = req.body.credentials.email
-            }
-            if (req.body.credentials.password != null) {
-                res.user.credentials.password = req.body.credentials.password
-            }
-        }
-        if (req.body.data != null) {
-            if (req.body.data.username != null) {
-                res.user.data.username = req.body.data.username
-            }
-        }
+        res.user.credentials.userID = req.body.credentials.userID || res.user.credentials.userID
+        res.user.credentials.email = req.body.credentials.email || res.user.credentials.email
+        res.user.credentials.password = req.body.credentials.password || res.user.credentials.password
+        res.user.data.username = req.body.data.username || res.user.data.username
+        res.user.data.postIDs = req.body.data.postIDs || res.user.data.postIDs
+
         const updatedUser = await res.user.save()
         res.json(updatedUser)
     } catch (error) {
@@ -106,7 +96,7 @@ router.delete('/:id', getUser, async (req, res)=>{
     }
 })
 
-//delete all users
+/* delete all users
 router.delete('/', async (req, res)=>{
     try{
         const result = await User.deleteMany({});
@@ -115,13 +105,14 @@ router.delete('/', async (req, res)=>{
         res.status(500).json({message : error.message})
     }
 })
+*/
 
 // helper functions
 async function getUser(req, res, next){
     try {
         let user = await User.findById(req.params.id)
         if(!user){
-            return res.status(404).json({message : "Cannot find a user by given id"})
+            return res.status(404).json({message : __USER_NOT_FOUND})
         }
         res.user = user
     }catch(error){
@@ -133,10 +124,16 @@ async function getUser(req, res, next){
 async function userbyID(userID){
     try{
         let user = await User.findOne({"credentials.userID" : userID});
-        return {message : !user?__USER_NOT_FOUND:__USER_FOUND, user : user};
+        return {message : (!user?__USER_NOT_FOUND:__USER_FOUND), user : user};
     }catch(error){
         return {message : __SERVER_ERR, user : {}}
     }
+}
+
+
+async function checkEmailExistence(email) {
+    const validation = await emailValidator.validate(email);
+    return { verified : validation.valid, message: {message : (validation.valid?__VALID_EMAIL:__INVALID_EMAIL), validators: validation.validators, reason : validation.reason}}
 }
 
 module.exports = router
