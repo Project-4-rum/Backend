@@ -60,12 +60,15 @@ function getFilesByFilename(filename, callback) {
       callback(null);
     } else {
       try {
-        const filesArray = JSON.parse(data.trim());
+        // const filesArray = JSON.parse(data.trim());
+        const filesArray = data.trim().length > 0 ? JSON.parse(data) : [];
+
         const files = filesArray.filter((file) => {
           return (
             file.filename &&
             file.filename.toLowerCase().includes(filename.toLowerCase())
           );
+          // return filename.toLowerCase().includes(filename.toLowerCase());
         });
         callback(files);
       } catch (parseErr) {
@@ -95,5 +98,9 @@ function getFilesByTag(tags, callback) {
 }
 
 // getFilesByFilename("bugs");
+// const newFile = new File("testfile", "testfilename", 5000, "sandman", [
+//   "test1",
+//   "test2",
+// ]);
 
 module.exports = { File, getFilesByTag, getFilesByFilename };

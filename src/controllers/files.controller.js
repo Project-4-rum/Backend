@@ -54,9 +54,11 @@ const fileController = {
     //
     getFilesByFilename(filename, (files) => {
       if (files) {
-        console.log(files); // Process the retrieved files as needed
+        // console.log(files);
+        res.status(200).json(files);
       } else {
         console.log("Error retrieving files");
+        res.status(500).json({ error: "Error retrieving files data" });
       }
     });
   },
