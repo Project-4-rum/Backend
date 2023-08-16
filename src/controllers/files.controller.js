@@ -1,4 +1,8 @@
-const { File, getFilesByTag } = require("../models/files.model");
+const {
+  File,
+  getFilesByTag,
+  getFilesByFilename,
+} = require("../models/files.model");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -13,27 +17,48 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 100 * 1024 * 1024 },
+});
 
 const fileController = {
   uploadFile: (req, res) => {
     //
     upload.single("file")(req, res, function (err) {
-      console.log(req.file);
+      // console.log(req.file);
       if (err) {
         return res.status(400).json({ error: `Error uploading file ${err}` });
       }
       // console
 
-      const { filename, tags } = req.body;
+      const { filename, tags, uploadedby } = req.body;
       const tagsArray = tags.split(",").map((tag) => tag.trim());
-      const newFile = new File(filename, req.file.size, tagsArray);
+      const newFile = new File(
+        req.file.filename,
+        filename,
+        req.file.size,
+        uploadedby,
+        tagsArray
+      );
 
       res.status(201).json({ message: "File Uploaded Successfully" });
     });
   },
-  retrieveFiles: (req, res) => {
+  searchFilesByFilename: (req, res) => {
+    const { filename } = req.query;
+
+    if (!filename) {
+      return res.status(400).json({ error: "Filename parameter is required" });
+    }
     //
+    getFilesByFilename(filename, (files) => {
+      if (files) {
+        console.log(files); // Process the retrieved files as needed
+      } else {
+        console.log("Error retrieving files");
+      }
+    });
   },
   searchFilesByTag: (req, res) => {
     //

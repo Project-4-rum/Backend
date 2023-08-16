@@ -5,21 +5,24 @@ const fs = require("fs");
 const dbFilePath = path.join(__dirname, "../storage/DB/fileDB.json");
 
 class File {
-  constructor(filename, size, tags = []) {
+  constructor(uniquename, filename, size, uploadedby, tags = []) {
     this.id = uuidv4();
+    this.uniquename = uniquename;
     this.filename = filename;
     // this.path = path;
     this.size = size;
-    this.tags = tags;
+    (this.uploadedby = uploadedby), (this.tags = tags);
     this.appendToDB();
   }
 
   appendToDB() {
     const fileData = {
       id: this.id,
+      uniquename: this.uniquename,
       filename: this.filename,
       // path: this.path,
       size: this.size,
+      uploadedby: this.uploadedby,
       tags: this.tags,
     };
 
@@ -49,6 +52,30 @@ class File {
   }
 }
 
+function getFilesByFilename(filename, callback) {
+  fs.readFile(dbFilePath, "utf-8", (err, data) => {
+    if (err) {
+      console.log({ error: `Error reading: ${err}` });
+      console.error("ERROR", err);
+      callback(null);
+    } else {
+      try {
+        const filesArray = JSON.parse(data.trim());
+        const files = filesArray.filter((file) => {
+          return (
+            file.filename &&
+            file.filename.toLowerCase().includes(filename.toLowerCase())
+          );
+        });
+        callback(files);
+      } catch (parseErr) {
+        console.log({ error: `Error parsing JSON: ${parseErr}` });
+        callback(null);
+      }
+    }
+  });
+}
+
 function getFilesByTag(tags, callback) {
   fs.readFile(dbFilePath, "utf-8", (err, data) => {
     if (err) {
@@ -67,4 +94,6 @@ function getFilesByTag(tags, callback) {
   });
 }
 
-module.exports = { File, getFilesByTag };
+// getFilesByFilename("bugs");
+
+module.exports = { File, getFilesByTag, getFilesByFilename };
