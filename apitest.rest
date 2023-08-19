@@ -31,16 +31,21 @@ Content-Type: application/json
 
 
 ###
+GET http://localhost:3000/users/otp/sudhinkarki20@gmail.com
+
+
+###
 POST http://localhost:3000/users/
 Content-Type: application/json
 
 {
     "credentials" : {
-        "userID" : "yomama@111",
-        "email" : "sunilsapkota1224@gmail.com",
+        "email" : "pas077bct042@wrc.edu.np",
         "password" : "mynameisjeff69"
     },
     "data" : {
         "username" : "Jeff"
     }
 }
+
+

@@ -54,7 +54,7 @@ router.delete('/:id', getPost, async (req, res) => {
     }
 })
 
-/*
+
 //delete all posts
 router.delete('/', async (req, res)=>{
     try{
@@ -64,7 +64,7 @@ router.delete('/', async (req, res)=>{
         res.status(500).json({message : error.message})
     }
 })
-*/
+/**/
 
 async function getPost(req, res, next){
     try {
