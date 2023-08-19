@@ -62,11 +62,11 @@ const userController = {
         try { 
             const user = new User({
                 credentials: {
-                    email: req.body.credentials.email,
-                    password: req.body.credentials.password
+                    email: req.body.email,
+                    password: req.body.password
                 },
                 data: {
-                    username: req.body.data.username,
+                    username: req.body.username,
                     postIDs : []
                 }
             })
@@ -94,9 +94,9 @@ const userController = {
             if (!user) 
                 return res.status(404).json({ message: _UNF})
 
-            user.credentials.email = req.body.credentials.email || user.credentials.email 
-            user.credentials.password = req.body.credentials.password || user.credentials.password
-            user.data.username = req.body.data.username || user.data.username
+            user.credentials.email = req.body.email || user.credentials.email 
+            user.credentials.password = req.body.password || user.credentials.password
+            user.data.username = req.body.username || user.data.username
 
             const updatedUser = await res.user.save()
             res.json({message : _UUS})
