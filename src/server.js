@@ -1,20 +1,24 @@
-DATABASE_URL = 'mongodb://127.0.0.1:27018'
+require('dotenv').config()
+const express = require('express');
+const app = express();
+app.use(express.json());
 
-const express = require('express')
-const app = express()
-app.use(express.json())
+const mongoose = require('mongoose');
+const DATABASE_URL = 'mongodb://127.0.0.1:27018';
+const PORT = 3001
 
-const mongoose = require('mongoose')
-mongoose.connect(DATABASE_URL, {useNewUrlParser : true})
-const db = mongoose.connection
+mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
+const db = mongoose.connection;
 
-db.on('error', (error)=> console.error(error))
-db.once('open', ()=> console.log("Connected to local database"))
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log('Connected to local database'));
 
-const userRouter = require("./routes/users")
-app.use('/users', userRouter)
+const userRouter = require('./routes/users');
+const postRouter = require('./routes/posts');
+const fileRouter = require('./routes/files');
 
-const postRouter = require("./routes/posts")
-app.use('/posts', postRouter)
+app.use('/users', userRouter);
+app.use('/posts', postRouter);
+app.use('/files', fileRouter);
 
-app.listen(3000, () => console.log('Server started'))
+app.listen(PORT, () => console.log(`Server started on PORT ${PORT}`));
