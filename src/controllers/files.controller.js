@@ -1,11 +1,8 @@
-const {
-  File,
-  getFilesByTag,
-  getFilesByFilename,
-} = require("../models/files.model");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+
+const FileModel = require("../models/files.model");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -23,70 +20,66 @@ const upload = multer({
 });
 
 const fileController = {
-  uploadFile: (req, res) => {
-    //
-    upload.single("file")(req, res, function (err) {
-      // console.log(req.file);
-      if (err) {
-        return res.status(400).json({ error: `Error uploading file ${err}` });
-      }
-      // console
+  uploadFile: async (req, res) => {
+    try {
+      upload.single("file")(req, res, async function (err) {
+        if (err) {
+          return res.status(400).json({ error: `Error uploading file ${err}` });
+        }
 
-      const { filename, tags, uploadedby } = req.body;
-      const tagsArray = tags.split(",").map((tag) => tag.trim());
-      const newFile = new File(
-        req.file.filename,
-        filename,
-        req.file.size,
-        uploadedby,
-        tagsArray
+        const filename = req.body.filename;
+        const uniquename = req.file.filename;
+        const size = req.file.size;
+        const uploadedby = req.body.uploadedby;
+
+        const newFile = new FileModel({
+          uniquename: uniquename,
+          filename: filename,
+          size: size,
+          uploadedby: uploadedby,
+        });
+
+        try {
+          const savedFile = await newFile.save();
+          res.status(201).json({ id: savedFile._id });
+        } catch (err) {
+          res.status(500).json({ message: err.message });
+        }
+      });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  getfile: async (req, res) => {
+    try {
+      const file = await FileModel.findById(req.params.id);
+      if (!file) return res.status(404).json({ message: "FILE NOT FOUND" });
+
+      res.json(file);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  },
+
+  downloadFile: async (req, res) => {
+    try {
+      const file = await FileModel.findById(req.params.id);
+      if (!file) return res.status(404).json({ message: "FILE NOT FOUND" });
+
+      const filepath = path.join(
+        __dirname,
+        "../storage/files/",
+        file.uniquename
       );
 
-      res.status(201).json({ message: "File Uploaded Successfully" });
-    });
-  },
-  searchFilesByFilename: (req, res) => {
-    const { filename } = req.query;
-
-    if (!filename) {
-      return res.status(400).json({ error: "Filename parameter is required" });
-    }
-    //
-    getFilesByFilename(filename, (files) => {
-      if (files) {
-        // console.log(files);
-        res.status(200).json(files);
+      if (fs.existsSync(filepath)) {
+        res.download(filepath);
       } else {
-        console.log("Error retrieving files");
-        res.status(500).json({ error: "Error retrieving files data" });
+        res.status(404).json({ error: "File not found" });
       }
-    });
-  },
-  searchFilesByTag: (req, res) => {
-    //
-    const { tags } = req.query;
-    if (!tags) {
-      return res.status(400).json({ error: "Tags parameter is required" });
-    }
-
-    const tagsArray = tags.split(",").map((tags) => tags.trim());
-    getFilesByTag(tagsArray, (files) => {
-      if (files) {
-        res.status(200).json(files);
-      } else {
-        res.status(500).json({ error: "Error retrieving Files Data" });
-      }
-    });
-  },
-  downloadFile: (req, res) => {
-    //
-    const filename = req.params.filename;
-    const filepath = path.join(__dirname, "../storage/files/", filename);
-
-    if (fs.existsSync(filepath)) {
-      res.download(filepath);
-    } else {
-      res.status(404).json({ error: "File not found" });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
   },
 };
