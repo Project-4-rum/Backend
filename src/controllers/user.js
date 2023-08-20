@@ -150,13 +150,16 @@ const userController = {
             if (!user)
                 return res.status(404).json({ message: _UNF })
             
+            let attachments = req.body.attachments.split(',')
+            let tags = req.body.tags.split(',')
+            
             const _post = new Post({
                 userID : user._id,
                 header : req.body.header,
                 body : req.body.body,
-                tags : req.body.tags,
+                tags : tags,
                 upvotes : 0,
-                attachments : req.body.attachments
+                attachments : attachments
             })
     
             const post = await _post.save()
