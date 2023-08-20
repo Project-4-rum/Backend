@@ -14,6 +14,9 @@ const postController = {
             }else if(_tag){
                 const posts = await Post.find({tags : _tag})
                 res.json(posts)
+            }else{
+                const posts = await Post.find({})
+                res.json(posts)
             }
         }catch(error){
              res.status(400).json({message : error.message})
