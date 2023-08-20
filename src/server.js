@@ -1,7 +1,9 @@
 require('dotenv').config()
-const express = require('express');
-const app = express();
-app.use(express.json());
+const express = require('express')
+const app = express()
+const cors = require('cors')
+app.use(cors)
+app.use(express.json())
 
 const mongoose = require('mongoose');
 const DATABASE_URL = 'mongodb://127.0.0.1:27018';
