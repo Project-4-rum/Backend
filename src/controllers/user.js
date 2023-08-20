@@ -155,7 +155,7 @@ const userController = {
                 header : req.body.header,
                 body : req.body.body,
                 tags : req.body.tags,
-                upvotes : req.body.upvotes,
+                upvotes : 0,
                 attachments : req.body.attachments
             })
     

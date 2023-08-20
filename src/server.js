@@ -5,7 +5,7 @@ app.use(express.json());
 
 const mongoose = require('mongoose');
 const DATABASE_URL = 'mongodb://127.0.0.1:27018';
-const PORT = 3001
+const PORT = 3000
 
 mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
 const db = mongoose.connection;
