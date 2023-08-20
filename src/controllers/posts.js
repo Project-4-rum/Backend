@@ -3,10 +3,18 @@ const Post = require('../models/posts')
 const postController = {
     getPost : async (req, res)=>{
         try {
-            let post = await Post.findById(req.params.id)
-            if(!post)
-                res.status(404).json({message : "Cannot find a post by given id"})
-            res.json(post)
+            let id = req.query.id
+            let _tag = req.query.tags
+
+            if(id){
+                let post = await Post.findById(id)
+                if(!post)
+                    res.status(404).json({message : "Cannot find a post by given id"})
+                res.json(post)
+            }else if(_tag){
+                const posts = await Post.find({tags : _tag})
+                res.json(posts)
+            }
         }catch(error){
              res.status(400).json({message : error.message})
         }

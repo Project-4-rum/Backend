@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const postController = require('../controllers/posts')
 
-router.get('/:id', postController.getPost)
+router.get('/', postController.getPost)
 router.post('/', postController.createPost)
 router.patch('/:id', postController.updatePost)
 router.delete('/:id', postController.deletePost)

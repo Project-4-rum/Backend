@@ -146,6 +146,8 @@ const userController = {
     },
     createPost : async (req, res) => {
         try{
+
+            
             let user = await User.findById(req.params.id)
             if (!user)
                 return res.status(404).json({ message: _UNF })
